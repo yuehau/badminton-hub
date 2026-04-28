@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmashValue — Badminton Equipment Hub</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f7f8fa;--bg2:#fff;--bg3:#eef0f3;
+  --txt:#111;--txt2:#555;--txt3:#888;
+  --accent:#1a73e8;--accent2:#e8f0fe;--accenttxt:#1557b0;
+  --green:#1e8a47;--green2:#e6f4ea;--greentxt:#145c2f;
+  --amber:#b55d00;--amber2:#fff3e0;--ambertxt:#7a3e00;
+  --red:#c62828;--red2:#fdecea;
+  --border:#e0e3e8;--border2:#ccd0d7;
+  --radius:10px;--radius2:6px;
+  --shadow:0 2px 8px rgba(0,0,0,.08);
+  --shadow2:0 4px 20px rgba(0,0,0,.14);
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;font-size:15px}
+a{color:var(--accent);text-decoration:none}
+
+/* HEADER */
+header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;gap:24px;height:58px;position:sticky;top:0;z-index:100}
+.logo{font-size:20px;font-weight:800;letter-spacing:-.5px;color:var(--txt)}
+.logo span{color:var(--accent)}
+nav{display:flex;gap:4px;flex:1}
+.nav-btn{background:none;border:none;padding:7px 14px;border-radius:var(--radius2);font-size:14px;cursor:pointer;color:var(--txt2);font-weight:500;transition:.15s}
+.nav-btn:hover{background:var(--bg3);color:var(--txt)}
+.nav-btn.active{background:var(--accent2);color:var(--accenttxt)}
+.compare-badge{background:var(--accent);color:#fff;border-radius:99px;font-size:11px;padding:1px 6px;margin-left:4px;font-weight:700}
+.header-right{display:flex;gap:8px;align-items:center}
+
+/* MAIN */
+main{max-width:1100px;margin:0 auto;padding:28px 20px}
+h1{font-size:26px;font-weight:700;margin-bottom:4px}
+.subtitle{color:var(--txt2);font-size:14px;margin-bottom:24px}
+
+/* CATEGORY TABS */
+.cat-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.cat-tab{background:var(--bg2);border:1px solid var(--border);border-radius:99px;padding:6px 16px;font-size:13px;font-weight:500;cursor:pointer;transition:.15s;color:var(--txt2)}
+.cat-tab:hover{border-color:var(--accent);color:var(--accent)}
+.cat-tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* SEARCH */
+.search-row{display:flex;gap:10px;margin-bottom:20px;align-items:center}
+.search-wrap{flex:1;position:relative}
+.search-wrap input{width:100%;padding:9px 14px 9px 38px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px;background:var(--bg2);color:var(--txt);outline:none;transition:.15s}
+.search-wrap input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(26,115,232,.12)}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--txt3);font-size:16px;pointer-events:none}
+.sort-select{padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:var(--bg2);color:var(--txt);cursor:pointer;outline:none}
+
+/* PRODUCT GRID */
+.product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.product-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;cursor:pointer;transition:.18s;position:relative}
+.product-card:hover{box-shadow:var(--shadow);border-color:var(--border2);transform:translateY(-1px)}
+.product-card.in-compare{border-color:var(--accent);box-shadow:0 0 0 2px rgba(26,115,232,.25)}
+.card-emoji{font-size:32px;margin-bottom:10px;display:block}
+.card-brand{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--txt3);font-weight:600}
+.card-name{font-size:15px;font-weight:700;margin:3px 0 8px;line-height:1.3}
+.card-row{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.price-range{font-size:13px;color:var(--txt2)}
+.price-range strong{color:var(--txt);font-size:15px}
+.vfm-badge{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:4px 9px;border-radius:99px}
+.vfm-high{background:var(--green2);color:var(--greentxt)}
+.vfm-mid{background:var(--amber2);color:var(--ambertxt)}
+.vfm-low{background:var(--red2);color:var(--red)}
+.card-actions{display:flex;gap:6px;margin-top:12px}
+.btn{padding:7px 14px;border-radius:var(--radius2);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:.15s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#1557b0}
+.btn-outline{background:none;border:1px solid var(--border2);color:var(--txt2)}
+.btn-outline:hover{background:var(--bg3);color:var(--txt)}
+.btn-outline.active{border-color:var(--accent);color:var(--accenttxt);background:var(--accent2)}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn-danger{background:none;border:1px solid var(--border2);color:var(--red);font-size:12px;padding:4px 10px}
+.btn-danger:hover{background:var(--red2)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.modal{background:var(--bg2);border-radius:14px;max-width:780px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow2)}
+.modal-header{display:flex;justify-content:space-between;align-items:flex-start;padding:22px 24px 16px;border-bottom:1px solid var(--border)}
+.modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--txt3);padding:0 4px;line-height:1}
+.modal-close:hover{color:var(--txt)}
+.modal-body{padding:20px 24px}
+.modal-emoji{font-size:42px;margin-bottom:8px;display:block}
+.modal-brand{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--txt3);font-weight:600}
+.modal-name{font-size:22px;font-weight:800;margin:4px 0 16px}
+
+/* TABS in modal */
+.modal-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px}
+.modal-tab{background:none;border:none;padding:10px 18px;font-size:14px;font-weight:500;cursor:pointer;color:var(--txt2);border-bottom:2px solid transparent;margin-bottom:-1px;transition:.15s}
+.modal-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* SPECS TABLE */
+.specs-table{width:100%;border-collapse:collapse;font-size:14px}
+.specs-table tr{border-bottom:1px solid var(--border)}
+.specs-table td{padding:9px 6px}
+.specs-table td:first-child{color:var(--txt3);font-weight:500;width:45%}
+.specs-table td:last-child{font-weight:600;color:var(--txt)}
+
+/* PRICE TABLE */
+.price-section h3{font-size:15px;font-weight:700;margin-bottom:14px}
+.price-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.price-shop{flex:1;font-size:14px;font-weight:600}
+.price-val{font-size:16px;font-weight:700;color:var(--txt);min-width:80px;text-align:right}
+.price-bar-wrap{flex:2;background:var(--bg3);border-radius:99px;height:8px;overflow:hidden}
+.price-bar{height:100%;border-radius:99px;background:var(--accent);transition:.4s}
+.price-best{background:var(--green2);color:var(--greentxt);font-size:11px;font-weight:700;padding:2px 7px;border-radius:99px}
+.chart-wrap{height:200px;position:relative;margin-top:16px}
+
+/* VFM SCORE */
+.vfm-section{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;margin-bottom:20px}
+.vfm-ring-wrap{display:flex;flex-direction:column;align-items:center;gap:6px}
+.vfm-ring{width:90px;height:90px;position:relative}
+.vfm-ring svg{width:100%;height:100%}
+.vfm-number{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:var(--txt)}
+.vfm-label{font-size:12px;color:var(--txt2);font-weight:500}
+.vfm-breakdown{flex:1;min-width:200px}
+.vfm-breakdown h4{font-size:13px;font-weight:700;margin-bottom:12px;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px}
+.vfm-item{margin-bottom:10px}
+.vfm-item-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}
+.vfm-bar-bg{background:var(--bg3);border-radius:99px;height:6px}
+.vfm-bar-fill{height:100%;border-radius:99px;transition:.5s}
+
+/* REVIEWS */
+.review-list{display:flex;flex-direction:column;gap:14px;margin-bottom:24px}
+.review-card{background:var(--bg3);border-radius:var(--radius);padding:14px 16px}
+.review-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.review-user{font-weight:700;font-size:14px}
+.review-date{font-size:12px;color:var(--txt3)}
+.stars{color:#f4a100;font-size:15px;letter-spacing:1px;margin-bottom:6px}
+.review-text{font-size:14px;color:var(--txt2);line-height:1.55}
+.review-form{background:var(--bg3);border-radius:var(--radius);padding:16px}
+.review-form h4{font-size:14px;font-weight:700;margin-bottom:12px}
+.form-row{margin-bottom:12px}
+.form-row label{font-size:12px;font-weight:600;color:var(--txt2);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+.form-row input,.form-row textarea,.form-row select{width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:var(--radius2);font-size:14px;background:var(--bg2);color:var(--txt);outline:none;font-family:inherit;transition:.15s}
+.form-row input:focus,.form-row textarea:focus,.form-row select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(26,115,232,.1)}
+.form-row textarea{resize:vertical;min-height:70px}
+.star-select{display:flex;gap:6px;margin-top:4px}
+.star-btn{background:none;border:none;font-size:24px;cursor:pointer;color:#ddd;transition:.1s;padding:0}
+.star-btn.lit{color:#f4a100}
+
+/* COMPARE VIEW */
+.compare-grid{display:grid;gap:0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.compare-head-row{display:flex;background:var(--bg3);border-bottom:1px solid var(--border)}
+.compare-head-cell{flex:1;padding:14px 16px;font-size:13px;font-weight:700;text-align:center;border-right:1px solid var(--border);min-width:0}
+.compare-head-cell:last-child{border-right:none}
+.compare-head-cell .del-btn{background:none;border:none;color:var(--red);font-size:16px;cursor:pointer;padding:2px;margin-left:6px}
+.compare-row{display:flex;border-bottom:1px solid var(--border)}
+.compare-row:last-child{border-bottom:none}
+.compare-row:hover{background:var(--bg3)}
+.compare-label{width:160px;min-width:160px;padding:11px 14px;font-size:13px;color:var(--txt2);font-weight:500;border-right:1px solid var(--border);background:var(--bg)}
+.compare-cell{flex:1;padding:11px 16px;font-size:13px;text-align:center;border-right:1px solid var(--border);font-weight:500;min-width:0}
+.compare-cell:last-child{border-right:none}
+.compare-cell.best{color:var(--greentxt);font-weight:700}
+.compare-cell.worst{color:var(--red)}
+.compare-empty{text-align:center;padding:40px;color:var(--txt3);font-size:15px}
+
+/* ADMIN */
+.admin-wrap{max-width:640px;margin:0 auto}
+.admin-login{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:32px;text-align:center;max-width:380px;margin:60px auto}
+.admin-login h2{margin-bottom:20px}
+.section-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px}
+.section-card h3{font-size:16px;font-weight:700;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-grid .span2{grid-column:span 2}
+.spec-entry-row{display:flex;gap:8px;margin-bottom:8px;align-items:center}
+.spec-entry-row input{flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius2);font-size:13px;background:var(--bg2);color:var(--txt);outline:none}
+.spec-entry-row input:focus{border-color:var(--accent)}
+.remove-spec{background:none;border:none;color:var(--red);cursor:pointer;font-size:18px;padding:0 4px}
+.info-box{background:var(--accent2);color:var(--accenttxt);border-radius:var(--radius2);padding:10px 14px;font-size:13px;margin-bottom:16px}
+.success-box{background:var(--green2);color:var(--greentxt);border-radius:var(--radius2);padding:10px 14px;font-size:13px;margin-bottom:16px}
+
+/* EMPTY */
+.empty{text-align:center;padding:60px 20px;color:var(--txt3)}
+.empty-icon{font-size:48px;margin-bottom:12px}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 20px;border-radius:99px;font-size:14px;font-weight:500;z-index:500;opacity:0;transition:.25s;pointer-events:none}
+.toast.show{opacity:1}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+@media(max-width:600px){
+  main{padding:16px 12px}
+  .form-grid{grid-template-columns:1fr}
+  .form-grid .span2{grid-column:span 1}
+  .compare-label{width:110px;min-width:110px;font-size:11px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Smash<span>Value</span></div>
+  <nav>
+    <button class="nav-btn active" onclick="setView('browse')">Browse</button>
+    <button class="nav-btn" onclick="setView('compare')">Compare <span class="compare-badge" id="compare-count">0</span></button>
+    <button class="nav-btn" onclick="setView('admin')">Admin</button>
+  </nav>
+  <div class="header-right">
+    <span style="font-size:12px;color:var(--txt3)" id="product-count"></span>
+  </div>
+</header>
+
+<main id="main-content"></main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────
+const SHOPS = ['Vsmash','Lazada','Shopee','Sports Direct'];
+const CATEGORIES = ['All','Racquets','Shuttlecocks','Grips','Strings','Shoes','Bags'];
+const EMOJIS = {Racquets:'🏸',Shuttlecocks:'🪶',Grips:'🖐️',Strings:'〰️',Shoes:'👟',Bags:'🎒'};
+
+let state = {
+  view:'browse',
+  category:'All',
+  search:'',
+  sort:'vfm',
+  compare:[],
+  modalProduct:null,
+  modalTab:'specs',
+  adminLoggedIn:false,
+  adminMsg:'',
+  newSpecRows:[{k:'',v:''}],
+  newProductRating:0,
+};
+
+// Load saved data
+let products = JSON.parse(localStorage.getItem('sv_products')||'null') || getDefaultProducts();
+let reviews = JSON.parse(localStorage.getItem('sv_reviews')||'{}');
+
+function saveProducts(){localStorage.setItem('sv_products',JSON.stringify(products))}
+function saveReviews(){localStorage.setItem('sv_reviews',JSON.stringify(reviews))}
+
+function getDefaultProducts(){return [
+  {id:1,category:'Racquets',brand:'Yonex',name:'Astrox 88D Pro',
+   specs:{'Weight':'83g (3U)','Flexibility':'Stiff','Balance':'Head Heavy','Frame Material':'HM Graphite','Shaft Material':'HM Graphite','Max Tension':'35 lbs','Player Level':'Advanced','Playing Style':'Doubles Attack'},
+   prices:{Vsmash:620,Lazada:589,Shopee:599,'Sports Direct':650},vfmScore:82,
+   vfmBreakdown:{specs_value:88,price_competitiveness:74,durability:84}},
+  {id:2,category:'Racquets',brand:'Li-Ning',name:'Axforce 80',
+   specs:{'Weight':'85g (3U)','Flexibility':'Medium Stiff','Balance':'Even Balance','Frame Material':'Carbon Fiber','Shaft Material':'Carbon Fiber','Max Tension':'30 lbs','Player Level':'Intermediate','Playing Style':'All-Round'},
+   prices:{Vsmash:380,Lazada:360,Shopee:355,'Sports Direct':400},vfmScore:91,
+   vfmBreakdown:{specs_value:82,price_competitiveness:97,durability:90}},
+  {id:3,category:'Racquets',brand:'Victor',name:'Thruster K 9900',
+   specs:{'Weight':'88g (3U)','Flexibility':'Extra Stiff','Balance':'Head Heavy','Frame Material':'Nano Fortify TR','Shaft Material':'Nano Fortify','Max Tension':'38 lbs','Player Level':'Professional','Playing Style':'Power Smash'},
+   prices:{Vsmash:850,Lazada:820,Shopee:815,'Sports Direct':890},vfmScore:74,
+   vfmBreakdown:{specs_value:95,price_competitiveness:52,durability:78}},
+  {id:4,category:'Racquets',brand:'Yonex',name:'Nanoflare 1000Z',
+   specs:{'Weight':'73g (4U)','Flexibility':'Extra Stiff','Balance':'Head Light','Frame Material':'Nanometric DR','Shaft Material':'Rotational Generator System','Max Tension':'32 lbs','Player Level':'Advanced','Playing Style':'Singles Fast'},
+   prices:{Vsmash:780,Lazada:749,Shopee:745,'Sports Direct':820},vfmScore:79,
+   vfmBreakdown:{specs_value:92,price_competitiveness:64,durability:80}},
+  {id:5,category:'Shuttlecocks',brand:'Yonex',name:'AS-9 Feather',
+   specs:{'Type':'Feather','Feather Count':'16','Speed':'77 / 78','Suitable Court':'Air-conditioned','Durability':'Medium','Grade':'Tournament','Pack':'12 pcs'},
+   prices:{Vsmash:85,Lazada:79,Shopee:78,'Sports Direct':90},vfmScore:78,
+   vfmBreakdown:{specs_value:88,price_competitiveness:70,durability:74}},
+  {id:6,category:'Shuttlecocks',brand:'RSL',name:'Classic Tournament',
+   specs:{'Type':'Feather','Feather Count':'16','Speed':'77 / 78 / 79','Suitable Court':'All Courts','Durability':'High','Grade':'Tournament','Pack':'12 pcs'},
+   prices:{Vsmash:72,Lazada:68,Shopee:65,'Sports Direct':75},vfmScore:88,
+   vfmBreakdown:{specs_value:84,price_competitiveness:92,durability:88}},
+  {id:7,category:'Shuttlecocks',brand:'Yonex',name:'Mavis 2000 Nylon',
+   specs:{'Type':'Nylon','Speed':'77 / 78 / 79','Suitable Court':'All Weather','Durability':'Very High','Grade':'Training','Pack':'6 pcs'},
+   prices:{Vsmash:35,Lazada:32,Shopee:31,'Sports Direct':38},vfmScore:94,
+   vfmBreakdown:{specs_value:72,price_competitiveness:98,durability:97}},
+  {id:8,category:'Grips',brand:'Yonex',name:'AC102 Towel Grip',
+   specs:{'Type':'Towel Grip','Length':'1100mm','Thickness':'1.5mm','Material':'Cotton Terry','Sweat Absorption':'Excellent','Pack':'1 pc','Suitable For':'All Players'},
+   prices:{Vsmash:22,Lazada:18,Shopee:17,'Sports Direct':25},vfmScore:85,
+   vfmBreakdown:{specs_value:80,price_competitiveness:90,durability:82}},
+  {id:9,category:'Grips',brand:'Victor',name:'GR262 Overgrip',
+   specs:{'Type':'Overgrip','Length':'1050mm','Thickness':'0.6mm','Material':'Synthetic PU','Sweat Absorption':'Good','Pack':'3 pcs','Suitable For':'Recreational'},
+   prices:{Vsmash:15,Lazada:12,Shopee:11,'Sports Direct':18},vfmScore:92,
+   vfmBreakdown:{specs_value:70,price_competitiveness:98,durability:88}},
+  {id:10,category:'Strings',brand:'Yonex',name:'BG80 Power',
+   specs:{'Gauge':'0.68mm','Material':'High Polymer Nylon','Repulsion Power':'High','Durability':'Medium','Feel':'Crisp','Recommended Tension':'24–30 lbs','Best For':'Smash'},
+   prices:{Vsmash:28,Lazada:25,Shopee:24,'Sports Direct':30},vfmScore:80,
+   vfmBreakdown:{specs_value:84,price_competitiveness:78,durability:74}},
+  {id:11,category:'Strings',brand:'Yonex',name:'BG65 Durable',
+   specs:{'Gauge':'0.70mm','Material':'Multifilament Nylon','Repulsion Power':'Medium','Durability':'High','Feel':'Solid','Recommended Tension':'22–28 lbs','Best For':'All-Round'},
+   prices:{Vsmash:20,Lazada:17,Shopee:16,'Sports Direct':22},vfmScore:90,
+   vfmBreakdown:{specs_value:74,price_competitiveness:96,durability:92}},
+  {id:12,category:'Shoes',brand:'Yonex',name:'Power Cushion 65Z3',
+   specs:{'Upper':'Synthetic Leather + Mesh','Midsole':'Power Cushion Plus','Outsole':'Hexagrip','Width':'Wide','Weight':'~320g','Suitable Court':'Indoor Wooden','Player Level':'Advanced'},
+   prices:{Vsmash:520,Lazada:495,Shopee:489,'Sports Direct':549},vfmScore:83,
+   vfmBreakdown:{specs_value:90,price_competitiveness:76,durability:82}},
+  {id:13,category:'Shoes',brand:'Victor',name:'A970 Speed',
+   specs:{'Upper':'Mesh + TPU','Midsole':'EVA Compound','Outsole':'Carbon Fiber Plate','Width':'Normal','Weight':'~280g','Suitable Court':'Indoor','Player Level':'Advanced'},
+   prices:{Vsmash:460,Lazada:435,Shopee:429,'Sports Direct':490},vfmScore:86,
+   vfmBreakdown:{specs_value:88,price_competitiveness:84,durability:84}},
+];}
+
+// Sample reviews (defaults)
+if(!Object.keys(reviews).length){
+  reviews={
+    1:[{user:'KL_Smasher',rating:5,text:'Incredible power on smashes! The head-heavy balance really transfers energy well. Highly recommend for doubles players.',date:'2025-03-10'},
+       {user:'BadmintonPro88',rating:4,text:'Great racquet but takes time to get used to the stiff flex. Once you do, your smash speed jumps noticeably.',date:'2025-02-20'}],
+    2:[{user:'ShuttleMaster',rating:5,text:'Best value racquet I have owned. Very versatile for all round play. Li-Ning has really stepped up their quality.',date:'2025-01-15'}],
+    5:[{user:'CourtKing_PJ',rating:4,text:'Good flight trajectory, consistent speed across the tube. Feathers last decent for tournament grade.',date:'2025-04-01'}],
+    6:[{user:'NetKiller',rating:5,text:'RSL Classic is my go-to for training sessions. Outstanding value for feather shuttle.',date:'2025-03-22'},
+       {user:'PJPlayer',rating:4,text:'Consistent flight. A bit pricier than Mavis but miles better feel.',date:'2025-02-05'}],
+    8:[{user:'GripKing',rating:5,text:'Best towel grip on the market. Absorbs sweat like crazy during long sessions.',date:'2025-02-10'}],
+    10:[{user:'StringNerd',rating:4,text:'Great repulsion power. Snaps faster than BG65 but worth it for smash players.',date:'2025-01-30'}],
+    12:[{user:'SpeedDemon',rating:5,text:'Phenomenal cushioning. My knees thank me after every long session. Wide fit is perfect.',date:'2025-03-15'}],
+  };
+  saveReviews();
+}
+
+// ─── HELPERS ────────────────────────────────────────────────────
+function minPrice(p){return Math.min(...Object.values(p.prices))}
+function maxPrice(p){return Math.max(...Object.values(p.prices))}
+function bestShop(p){const e=Object.entries(p.prices);return e.reduce((a,b)=>b[1]<a[1]?b:a,e[0])}
+function vfmClass(s){return s>=85?'vfm-high':s>=70?'vfm-mid':'vfm-low'}
+function vfmBarColor(s){return s>=85?'#1e8a47':s>=70?'#b55d00':'#c62828'}
+function stars(n){return '★'.repeat(n)+'☆'.repeat(5-n)}
+function avgRating(id){const r=reviews[id];if(!r||!r.length)return null;return(r.reduce((a,b)=>a+b.rating,0)/r.length).toFixed(1)}
+function fmtDate(d){return new Date(d).toLocaleDateString('en-MY',{day:'numeric',month:'short',year:'numeric'})}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+function nextId(){return Math.max(0,...products.map(p=>p.id))+1}
+
+// ─── STATE MANAGEMENT ──────────────────────────────────────────
+function setView(v){
+  state.view=v;
+  state.modalProduct=null;
+  document.querySelectorAll('.nav-btn').forEach((b,i)=>b.classList.toggle('active',['browse','compare','admin'][i]===v));
+  render();
+}
+
+function getFiltered(){
+  let p=[...products];
+  if(state.category!=='All')p=p.filter(x=>x.category===state.category);
+  if(state.search)p=p.filter(x=>`${x.brand} ${x.name}`.toLowerCase().includes(state.search.toLowerCase()));
+  if(state.sort==='vfm')p.sort((a,b)=>b.vfmScore-a.vfmScore);
+  else if(state.sort==='price-asc')p.sort((a,b)=>minPrice(a)-minPrice(b));
+  else if(state.sort==='price-desc')p.sort((a,b)=>minPrice(b)-minPrice(a));
+  else if(state.sort==='name')p.sort((a,b)=>a.name.localeCompare(b.name));
+  return p;
+}
+
+function toggleCompare(id){
+  const idx=state.compare.indexOf(id);
+  if(idx>-1){state.compare.splice(idx,1)}
+  else if(state.compare.length>=3){toast('Max 3 products for comparison');return}
+  else{state.compare.push(id)}
+  document.getElementById('compare-count').textContent=state.compare.length;
+  render();
+}
+
+// ─── RENDER ─────────────────────────────────────────────────────
+function render(){
+  const m=document.getElementById('main-content');
+  document.getElementById('product-count').textContent=`${products.length} products`;
+  if(state.modalProduct){m.innerHTML=renderModal();bindModal();return}
+  if(state.view==='browse')m.innerHTML=renderBrowse();
+  else if(state.view==='compare')m.innerHTML=renderCompare();
+  else if(state.view==='admin')m.innerHTML=renderAdmin();
+  bindEvents();
+}
+
+// ─── BROWSE ─────────────────────────────────────────────────────
+function renderBrowse(){
+  const filtered=getFiltered();
+  const cards=filtered.length?filtered.map(p=>renderCard(p)).join(''):`<div class="empty"><div class="empty-icon">🔍</div><div>No products found</div></div>`;
+  return`<h1>Badminton Equipment Hub</h1>
+<p class="subtitle">Compare prices across shops & find the best value-for-money gear</p>
+<div class="cat-tabs">${CATEGORIES.map(c=>`<button class="cat-tab${state.category===c?' active':''}" data-cat="${c}">${c==='All'?'🏅 All':EMOJIS[c]+' '+c}</button>`).join('')}</div>
+<div class="search-row">
+  <div class="search-wrap"><span class="search-icon">🔍</span><input type="text" placeholder="Search brand or product name..." value="${state.search}" id="search-input"></div>
+  <select class="sort-select" id="sort-select">
+    <option value="vfm"${state.sort==='vfm'?' selected':''}>Best Value</option>
+    <option value="price-asc"${state.sort==='price-asc'?' selected':''}>Price ↑</option>
+    <option value="price-desc"${state.sort==='price-desc'?' selected':''}>Price ↓</option>
+    <option value="name"${state.sort==='name'?' selected':''}>Name A–Z</option>
+  </select>
+</div>
+<div class="product-grid">${cards}</div>`;
+}
+
+function renderCard(p){
+  const inC=state.compare.includes(p.id);
+  const avg=avgRating(p.id);
+  const rv=reviews[p.id]||[];
+  return`<div class="product-card${inC?' in-compare':''}" data-id="${p.id}">
+  <span class="card-emoji">${EMOJIS[p.category]||'📦'}</span>
+  <div class="card-brand">${p.brand}</div>
+  <div class="card-name">${p.name}</div>
+  ${avg?`<div style="font-size:13px;color:#f4a100">${'★'.repeat(Math.round(avg))}<span style="color:var(--txt3);margin-left:4px">${avg} (${rv.length})</span></div>`:'<div style="font-size:12px;color:var(--txt3)">No reviews yet</div>'}
+  <div class="card-row">
+    <div class="price-range">From <strong>RM ${minPrice(p)}</strong></div>
+    <div class="vfm-badge ${vfmClass(p.vfmScore)}">⚡ ${p.vfmScore}</div>
+  </div>
+  <div class="card-actions">
+    <button class="btn btn-primary btn-sm" data-open="${p.id}">View Details</button>
+    <button class="btn btn-outline btn-sm${inC?' active':''}" data-compare="${p.id}">${inC?'✓ Added':'+ Compare'}</button>
+  </div>
+</div>`;
+}
+
+// ─── MODAL ──────────────────────────────────────────────────────
+function renderModal(){
+  const p=state.modalProduct;
+  const tab=state.modalTab;
+  const rv=reviews[p.id]||[];
+  const avg=avgRating(p.id);
+  return`<div class="modal-overlay" id="modal-overlay">
+<div class="modal">
+  <div class="modal-header">
+    <div>
+      <span class="modal-emoji">${EMOJIS[p.category]||'📦'}</span>
+      <div class="modal-brand">${p.brand} · ${p.category}</div>
+      <div class="modal-name">${p.name}</div>
+      ${avg?`<div style="color:#f4a100;font-size:16px">${'★'.repeat(Math.round(avg))}<span style="color:var(--txt3);font-size:13px;margin-left:6px">${avg} avg · ${rv.length} review${rv.length!==1?'s':''}</span></div>`:'<div style="font-size:13px;color:var(--txt3)">No reviews yet — be the first!</div>'}
+    </div>
+    <button class="modal-close" id="modal-close">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="modal-tabs">
+      ${['specs','prices','vfm','reviews'].map(t=>`<button class="modal-tab${tab===t?' active':''}" data-tab="${t}">${{specs:'📋 Specs',prices:'💰 Prices',vfm:'⚡ Value Score',reviews:'💬 Reviews'}[t]}</button>`).join('')}
+    </div>
+    ${tab==='specs'?renderSpecsTab(p):''}
+    ${tab==='prices'?renderPricesTab(p):''}
+    ${tab==='vfm'?renderVfmTab(p):''}
+    ${tab==='reviews'?renderReviewsTab(p):''}
+  </div>
+</div>
+</div>`;
+}
+
+function renderSpecsTab(p){
+  const rows=Object.entries(p.specs).map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join('');
+  const best=bestShop(p);
+  return`<table class="specs-table">${rows}</table>
+<div style="margin-top:20px;padding:12px 16px;background:var(--green2);border-radius:var(--radius);display:flex;justify-content:space-between;align-items:center">
+  <div><div style="font-size:12px;color:var(--greentxt);font-weight:600;text-transform:uppercase;letter-spacing:.4px">Best price found at</div><div style="font-size:18px;font-weight:800;color:var(--greentxt)">${best[0]}</div></div>
+  <div style="font-size:24px;font-weight:800;color:var(--greentxt)">RM ${best[1]}</div>
+</div>`;
+}
+
+function renderPricesTab(p){
+  const prices=Object.entries(p.prices);
+  const min=Math.min(...prices.map(e=>e[1]));
+  const max=Math.max(...prices.map(e=>e[1]));
+  const rows=prices.map(([shop,price])=>{
+    const pct=Math.round(((price-min)/(max-min||1))*100);
+    const isMin=price===min;
+    return`<div class="price-row">
+      <div class="price-shop">${shop}${isMin?` <span class="price-best">Best</span>`:''}</div>
+      <div class="price-bar-wrap"><div class="price-bar" style="width:${20+pct*0.8}%;background:${isMin?'#1e8a47':'#1a73e8'}"></div></div>
+      <div class="price-val">RM ${price}</div>
+    </div>`;
+  }).join('');
+  const savings=max-min;
+  return`<div class="price-section">
+  <h3>Price Across Platforms</h3>
+  ${rows}
+  <div style="margin-top:16px;padding:12px 16px;background:var(--accent2);border-radius:var(--radius);display:flex;justify-content:space-between;font-size:14px">
+    <span style="color:var(--txt2)">Potential savings by shopping smart</span>
+    <strong style="color:var(--accenttxt)">Up to RM ${savings}</strong>
+  </div>
+  <div style="margin-top:20px">
+    <div style="font-size:13px;font-weight:600;color:var(--txt2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">Price Comparison Chart</div>
+    <div class="chart-wrap"><canvas id="price-chart" role="img" aria-label="Price comparison bar chart for ${p.name}">Prices: ${prices.map(e=>e[0]+' RM'+e[1]).join(', ')}</canvas></div>
+  </div>
+</div>`;
+}
+
+function renderVfmTab(p){
+  const bd=p.vfmBreakdown;
+  const dims=[['Specs Value','How well the specs justify the price',bd.specs_value],['Price Competitiveness','How competitive pricing is across platforms',bd.price_competitiveness],['Durability Rating','Expected lifespan and build quality',bd.durability]];
+  const ringColor=p.vfmScore>=85?'#1e8a47':p.vfmScore>=70?'#b55d00':'#c62828';
+  const circ=2*Math.PI*36;
+  const dash=circ*(p.vfmScore/100);
+  return`<div class="vfm-section">
+  <div class="vfm-ring-wrap">
+    <div class="vfm-ring">
+      <svg viewBox="0 0 90 90"><circle cx="45" cy="45" r="36" fill="none" stroke="var(--bg3)" stroke-width="8"/>
+      <circle cx="45" cy="45" r="36" fill="none" stroke="${ringColor}" stroke-width="8" stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}" stroke-linecap="round" transform="rotate(-90 45 45)"/></svg>
+      <div class="vfm-number">${p.vfmScore}</div>
+    </div>
+    <div class="vfm-label">Overall VFM</div>
+  </div>
+  <div class="vfm-breakdown">
+    <h4>Score Breakdown</h4>
+    ${dims.map(([label,desc,val])=>`<div class="vfm-item">
+      <div class="vfm-item-row"><span style="font-weight:600">${label}</span><span style="color:var(--txt2)">${val}/100</span></div>
+      <div style="font-size:12px;color:var(--txt3);margin-bottom:4px">${desc}</div>
+      <div class="vfm-bar-bg"><div class="vfm-bar-fill" style="width:${val}%;background:${vfmBarColor(val)}"></div></div>
+    </div>`).join('')}
+  </div>
+</div>
+<div style="background:var(--bg3);border-radius:var(--radius);padding:14px 16px;font-size:13px;color:var(--txt2);line-height:1.6">
+  <strong>How VFM is calculated:</strong> Our Value-for-Money score combines specs quality (40%), price competitiveness across platforms (40%), and durability rating (20%). Scores above 85 are excellent picks. 70–84 are solid choices. Below 70 means you are paying a premium for brand or pro specs.
+</div>`;
+}
+
+function renderReviewsTab(p){
+  const rv=reviews[p.id]||[];
+  const list=rv.length?rv.map(r=>`<div class="review-card">
+  <div class="review-top"><span class="review-user">👤 ${r.user}</span><span class="review-date">${fmtDate(r.date)}</span></div>
+  <div class="stars">${stars(r.rating)}</div>
+  <div class="review-text">${r.text}</div>
+</div>`).join(''):`<div style="text-align:center;padding:24px;color:var(--txt3);font-size:14px">No reviews yet. Be the first to share your experience!</div>`;
+
+  const starBtns=Array.from({length:5},(_,i)=>`<button class="star-btn${(state.newProductRating||0)>i?' lit':''}" data-star="${i+1}">★</button>`).join('');
+
+  return`<div class="review-list">${list}</div>
+<div class="review-form">
+  <h4>Share Your Experience</h4>
+  <div class="form-row"><label>Your Name</label><input type="text" id="rv-user" placeholder="e.g. CourtKing_KL" maxlength="30"></div>
+  <div class="form-row"><label>Rating</label><div class="star-select" id="star-select">${starBtns}</div></div>
+  <div class="form-row"><label>Your Review</label><textarea id="rv-text" placeholder="Share your experience with this product..." rows="3"></textarea></div>
+  <button class="btn btn-primary" id="submit-review" data-pid="${p.id}">Submit Review</button>
+</div>`;
+}
+
+function bindModal(){
+  document.getElementById('modal-close').onclick=()=>{state.modalProduct=null;render()};
+  document.getElementById('modal-overlay').onclick=e=>{if(e.target.id==='modal-overlay'){state.modalProduct=null;render()}};
+  document.querySelectorAll('.modal-tab').forEach(b=>b.onclick=()=>{state.modalTab=b.dataset.tab;render()});
+
+  if(state.modalTab==='prices'){
+    setTimeout(()=>{
+      const p=state.modalProduct;
+      const ctx=document.getElementById('price-chart');
+      if(!ctx)return;
+      const entries=Object.entries(p.prices);
+      const min=Math.min(...entries.map(e=>e[1]));
+      new Chart(ctx,{type:'bar',data:{labels:entries.map(e=>e[0]),datasets:[{label:'Price (RM)',data:entries.map(e=>e[1]),backgroundColor:entries.map(e=>e[1]===min?'#1e8a47':'#1a73e8'),borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:false,min:Math.min(...entries.map(e=>e[1]))*0.92,ticks:{callback:v=>'RM '+v}}}}});
+    },100);
+  }
+
+  if(state.modalTab==='reviews'){
+    document.querySelectorAll('.star-btn').forEach(b=>b.onclick=()=>{
+      state.newProductRating=parseInt(b.dataset.star);
+      document.querySelectorAll('.star-btn').forEach((s,i)=>s.classList.toggle('lit',i<state.newProductRating));
+    });
+    document.getElementById('submit-review').onclick=()=>{
+      const pid=parseInt(document.getElementById('submit-review').dataset.pid);
+      const user=document.getElementById('rv-user').value.trim();
+      const text=document.getElementById('rv-text').value.trim();
+      const rating=state.newProductRating;
+      if(!user){toast('Please enter your name');return}
+      if(!rating){toast('Please select a star rating');return}
+      if(!text||text.length<10){toast('Please write at least 10 characters');return}
+      if(!reviews[pid])reviews[pid]=[];
+      reviews[pid].unshift({user,rating,text,date:new Date().toISOString().split('T')[0]});
+      saveReviews();
+      state.newProductRating=0;
+      toast('Review submitted! Thank you 🎉');
+      render();
+    };
+  }
+}
+
+// ─── COMPARE ────────────────────────────────────────────────────
+function renderCompare(){
+  const prods=products.filter(p=>state.compare.includes(p.id));
+  if(!prods.length)return`<h1>Compare Products</h1><p class="subtitle">Select up to 3 products from Browse to compare side by side</p><div class="compare-empty"><div class="empty-icon">⚖️</div><div>No products selected yet</div><br><button class="btn btn-primary" onclick="setView('browse')">Browse Products</button></div>`;
+  
+  const allSpecs=[...new Set(prods.flatMap(p=>Object.keys(p.specs)))];
+  const headCells=prods.map(p=>`<div class="compare-head-cell">${EMOJIS[p.category]} ${p.brand}<br><strong>${p.name}</strong><button class="del-btn" data-cid="${p.id}">✕</button></div>`).join('');
+
+  const specRows=allSpecs.map(spec=>{
+    const cells=prods.map(p=>`<div class="compare-cell">${p.specs[spec]||'—'}</div>`).join('');
+    return`<div class="compare-row"><div class="compare-label">${spec}</div>${cells}</div>`;
+  }).join('');
+
+  const priceRows=SHOPS.map(shop=>{
+    const vals=prods.map(p=>p.prices[shop]);
+    const min=Math.min(...vals);
+    const cells=vals.map(v=>`<div class="compare-cell${v===min?' best':''}">${v===min?'✓ ':''} RM ${v}</div>`).join('');
+    return`<div class="compare-row"><div class="compare-label">${shop}</div>${cells}</div>`;
+  }).join('');
+
+  const minPrices=prods.map(p=>minPrice(p));
+  const minP=Math.min(...minPrices);
+  const bestPriceCells=minPrices.map(v=>`<div class="compare-cell${v===minP?' best':''}">${v===minP?'🏆 ':''}RM ${v}</div>`).join('');
+
+  const vfms=prods.map(p=>p.vfmScore);
+  const maxV=Math.max(...vfms);
+  const vfmCells=vfms.map(v=>`<div class="compare-cell${v===maxV?' best':''}">${v===maxV?'🏆 ':''}${v}/100</div>`).join('');
+
+  return`<h1>Side-by-Side Comparison</h1>
+<p class="subtitle">${prods.length} product${prods.length!==1?'s':''} selected · <a href="#" onclick="setView('browse');return false">+ Add more</a></p>
+<div class="compare-grid">
+  <div class="compare-head-row"><div class="compare-label" style="background:var(--bg3)"></div>${headCells}</div>
+  <div class="compare-row" style="background:var(--accent2)"><div class="compare-label" style="font-weight:700;color:var(--accenttxt)">Best Price</div>${bestPriceCells}</div>
+  <div class="compare-row" style="background:var(--accent2)"><div class="compare-label" style="font-weight:700;color:var(--accenttxt)">VFM Score</div>${vfmCells}</div>
+  <div class="compare-row"><div class="compare-label" style="font-weight:700;color:var(--txt2);background:var(--bg)">— Prices by Shop —</div>${prods.map(()=>'<div class="compare-cell" style="color:var(--txt3);font-size:12px">↓ below</div>').join('')}</div>
+  ${priceRows}
+  <div class="compare-row"><div class="compare-label" style="font-weight:700;color:var(--txt2);background:var(--bg)">— Specifications —</div>${prods.map(()=>'<div class="compare-cell" style="color:var(--txt3);font-size:12px">↓ below</div>').join('')}</div>
+  ${specRows}
+</div>`;
+}
+
+// ─── ADMIN ──────────────────────────────────────────────────────
+function renderAdmin(){
+  if(!state.adminLoggedIn)return`<div class="admin-login">
+  <div style="font-size:36px;margin-bottom:8px">🔐</div>
+  <h2>Admin Panel</h2>
+  <p style="color:var(--txt2);font-size:14px;margin-bottom:20px">Enter password to manage products</p>
+  <div class="form-row"><input type="password" id="admin-pw" placeholder="Password" onkeydown="if(event.key==='Enter')adminLogin()"></div>
+  ${state.adminMsg?`<div style="color:var(--red);font-size:13px;margin-bottom:10px">${state.adminMsg}</div>`:''}
+  <button class="btn btn-primary" onclick="adminLogin()" style="width:100%">Login</button>
+  <p style="font-size:12px;color:var(--txt3);margin-top:12px">Hint: admin123</p>
+</div>`;
+
+  const specRows=state.newSpecRows.map((r,i)=>`<div class="spec-entry-row">
+  <input placeholder="Spec name (e.g. Weight)" value="${r.k}" oninput="state.newSpecRows[${i}].k=this.value">
+  <input placeholder="Value (e.g. 83g)" value="${r.v}" oninput="state.newSpecRows[${i}].v=this.value">
+  ${i>0?`<button class="remove-spec" onclick="removeSpecRow(${i})">✕</button>`:'<div style="width:28px"></div>'}
+</div>`).join('');
+
+  const prodList=products.map(p=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px">
+  <span>${EMOJIS[p.category]} <strong>${p.brand}</strong> ${p.name} <span style="color:var(--txt3);font-size:12px">(${p.category})</span></span>
+  <button class="btn-danger btn" onclick="deleteProduct(${p.id})">Delete</button>
+</div>`).join('');
+
+  return`<div class="admin-wrap">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+  <h1>Admin Panel</h1>
+  <button class="btn btn-outline btn-sm" onclick="state.adminLoggedIn=false;render()">Logout</button>
+</div>
+${state.adminMsg?`<div class="success-box">${state.adminMsg}</div>`:''}
+<div class="section-card">
+  <h3>Add New Product</h3>
+  <div class="info-box">Fill in all fields. VFM score (0–100) and breakdown are used for comparisons.</div>
+  <div class="form-grid">
+    <div class="form-row"><label>Brand</label><input type="text" id="a-brand" placeholder="e.g. Yonex"></div>
+    <div class="form-row"><label>Product Name</label><input type="text" id="a-name" placeholder="e.g. Astrox 100ZZ"></div>
+    <div class="form-row"><label>Category</label>
+      <select id="a-cat">${['Racquets','Shuttlecocks','Grips','Strings','Shoes','Bags'].map(c=>`<option>${c}</option>`).join('')}</select>
+    </div>
+    <div class="form-row"><label>VFM Score (0–100)</label><input type="number" id="a-vfm" min="0" max="100" placeholder="e.g. 85"></div>
+    <div class="form-row"><label>Specs Value (0–100)</label><input type="number" id="a-sv" min="0" max="100" placeholder="e.g. 90"></div>
+    <div class="form-row"><label>Price Competitiveness (0–100)</label><input type="number" id="a-pc" min="0" max="100" placeholder="e.g. 80"></div>
+    <div class="form-row"><label>Durability (0–100)</label><input type="number" id="a-dur" min="0" max="100" placeholder="e.g. 85"></div>
+    <div class="form-row"><label>Vsmash Price (RM)</label><input type="number" id="a-p1" placeholder="e.g. 620"></div>
+    <div class="form-row"><label>Lazada Price (RM)</label><input type="number" id="a-p2" placeholder="e.g. 589"></div>
+    <div class="form-row"><label>Shopee Price (RM)</label><input type="number" id="a-p3" placeholder="e.g. 599"></div>
+    <div class="form-row span2"><label>Sports Direct Price (RM)</label><input type="number" id="a-p4" placeholder="e.g. 650"></div>
+    <div class="form-row span2">
+      <label>Specifications</label>
+      ${specRows}
+      <button class="btn btn-outline btn-sm" onclick="addSpecRow()" style="margin-top:6px">+ Add Spec</button>
+    </div>
+  </div>
+  <button class="btn btn-primary" onclick="addProduct()" style="margin-top:12px">Add Product</button>
+</div>
+<div class="section-card">
+  <h3>Manage Products (${products.length})</h3>
+  ${prodList}
+</div>
+</div>`;
+}
+
+function adminLogin(){
+  const pw=document.getElementById('admin-pw').value;
+  if(pw==='admin123'){state.adminLoggedIn=true;state.adminMsg='';render()}
+  else{state.adminMsg='Incorrect password';render()}
+}
+
+function addSpecRow(){state.newSpecRows.push({k:'',v:''});render()}
+function removeSpecRow(i){state.newSpecRows.splice(i,1);render()}
+
+function addProduct(){
+  const g=id=>document.getElementById(id)?.value?.trim();
+  const brand=g('a-brand'),name=g('a-name'),cat=g('a-cat');
+  const vfm=parseInt(g('a-vfm')),sv=parseInt(g('a-sv')),pc=parseInt(g('a-pc')),dur=parseInt(g('a-dur'));
+  const p1=parseFloat(g('a-p1')),p2=parseFloat(g('a-p2')),p3=parseFloat(g('a-p3')),p4=parseFloat(g('a-p4'));
+  if(!brand||!name){toast('Brand and name required');return}
+  if(isNaN(vfm)||vfm<0||vfm>100){toast('VFM score must be 0–100');return}
+  if(isNaN(p1)||isNaN(p2)||isNaN(p3)||isNaN(p4)){toast('All 4 prices required');return}
+  const specs={};
+  state.newSpecRows.forEach(r=>{if(r.k&&r.v)specs[r.k]=r.v});
+  const prod={id:nextId(),category:cat,brand,name,specs,
+    prices:{Vsmash:p1,Lazada:p2,Shopee:p3,'Sports Direct':p4},
+    vfmScore:vfm,vfmBreakdown:{specs_value:isNaN(sv)?70:sv,price_competitiveness:isNaN(pc)?70:pc,durability:isNaN(dur)?70:dur}};
+  products.push(prod);
+  saveProducts();
+  state.newSpecRows=[{k:'',v:''}];
+  state.adminMsg=`✓ "${brand} ${name}" added successfully!`;
+  render();
+  setTimeout(()=>{state.adminMsg='';render()},3500);
+}
+
+function deleteProduct(id){
+  if(!confirm('Delete this product?'))return;
+  products=products.filter(p=>p.id!==id);
+  state.compare=state.compare.filter(c=>c!==id);
+  saveProducts();
+  toast('Product deleted');
+  render();
+}
+
+// ─── EVENTS ─────────────────────────────────────────────────────
+function bindEvents(){
+  document.querySelectorAll('.cat-tab').forEach(b=>b.onclick=()=>{state.category=b.dataset.cat;render()});
+  document.querySelectorAll('[data-open]').forEach(b=>b.onclick=e=>{e.stopPropagation();state.modalProduct=products.find(p=>p.id===parseInt(b.dataset.open));state.modalTab='specs';render()});
+  document.querySelectorAll('[data-compare]').forEach(b=>b.onclick=e=>{e.stopPropagation();toggleCompare(parseInt(b.dataset.compare))});
+  document.querySelectorAll('[data-cid]').forEach(b=>b.onclick=()=>{state.compare=state.compare.filter(c=>c!==parseInt(b.dataset.cid));document.getElementById('compare-count').textContent=state.compare.length;render()});
+
+  const si=document.getElementById('search-input');
+  if(si)si.oninput=e=>{state.search=e.target.value;render()};
+  const ss=document.getElementById('sort-select');
+  if(ss)ss.onchange=e=>{state.sort=e.target.value;render()};
+  const apw=document.getElementById('admin-pw');
+  if(apw)apw.onkeydown=e=>{if(e.key==='Enter')adminLogin()};
+}
+
+// ─── INIT ────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
